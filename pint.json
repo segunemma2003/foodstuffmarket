@@ -1,0 +1,21 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "braces_position": {
+            "functions_opening_brace": "same_line",
+            "classes_opening_brace": "same_line"
+        },
+        "global_namespace_import": {
+            "import_classes": true
+        },
+        "array_syntax": {
+            "syntax": "short"
+        },
+        "no_whitespace_before_comma_in_array": {
+            "after_heredoc": false
+        },
+        "ordered_class_elements": {
+            "sort_algorithm": "none"
+        }
+    }
+}
