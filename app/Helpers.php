@@ -3353,7 +3353,7 @@ function user_app_secret_key()
  */
 function smtp_provider_list()
 {
-    return $smtp_provider_list = ['Gmail', 'Yahoo', 'Webmail', 'Mailgun', 'Zoho', 'Elastic', 'Amazon SES', 'Mailtrap', 'Postmark', 'Mailjet', 'Sendgrid'];
+    return $smtp_provider_list = ['Gmail', 'Yahoo', 'Webmail', 'Mailgun', 'Zoho', 'Elastic', 'Amazon SES', 'Mailtrap', 'Postmark', 'Mailjet', 'Sendgrid', 'Resend'];
 }
 
 function smtp_driver_list()
@@ -4922,14 +4922,14 @@ function replaceTags($string, $tags)
 function addForeignKey(string $parentTableName, string $childTableName, string $parentTableId = 'id', string $foreignKey = null)
 {
     $foreignKey = $foreignKey ?? str($parentTableName)->singular()->snake()->toString() . '_id';
-    
+
     try {
         DB::table($childTableName)
         ->whereNotIn($foreignKey, function ($query) use ($parentTableName, $parentTableId) {
             $query->select($parentTableId)->from($parentTableName);
         })
         ->delete();
-        
+
         Schema::table($childTableName, function (Blueprint $table) use ($parentTableName, $parentTableId, $foreignKey) {
             $table->foreign($foreignKey)
             ->references($parentTableId)
