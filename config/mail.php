@@ -46,7 +46,7 @@ return [
             // 'stream' => [
             //     'ssl' => [
             //         'allow_self_signed' => true,
-            
+
             //         'verify_peer' => false,
             //         'verify_peer_name' => false,
             //     ],
@@ -57,7 +57,7 @@ return [
             'host' => env('SMTP_TEST_HOST', 'smtp.gmail.com'),
             'port' => env('SMTP_TEST_PORT', 587),
             'encryption' => env('SMTP_TEST_ENCRYPTION', 'tls'),
-            'username' => env('SMTP_TEST_USERNAME', 'demo.softtechit@gmail.com'),
+            'username' => env('SMTP_TEST_USERNAME', 'support@foodstuff.store'),
             'password' => env('SMTP_TEST_PASSWORD', 'hello-world'),
             'from_name' => env('SMTP_TEST_FROM_NAME', 'IMJOL'),
             'from_email' => env('SMTP_TEST_FROM_ADDRESS', 'mojahid@imjol.com'),
