@@ -503,7 +503,7 @@ class SmtpController extends Controller {
         overWriteEnvFile('DEFAULT_MAIL', $request->provider_name);
         overWriteEnvFile('MAIL_MAILER', $request->driver);
         overWriteEnvFile('MAIL_HOST', $request->host);
-        overWriteEnvFile('MAIL_PORT', $request->port);
+        overWriteEnvFile('MAIL_PORT', (int) $request->port);
         overWriteEnvFile('MAIL_USERNAME', $request->username);
         overWriteEnvFile('MAIL_PASSWORD', $request->password);
         overWriteEnvFile('MAIL_ENCRYPTION', $request->encryption);
