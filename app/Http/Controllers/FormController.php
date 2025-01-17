@@ -34,6 +34,10 @@ class FormController extends Controller
 
     public function store(Request $request){
         $data = $request->all();
-        return redirect()->route('form-builder.embed-playground');
+        return view('form-builder.embed-playground');
     }
+
+    // public function embedplayground(){
+    //     re
+    // }
 }
