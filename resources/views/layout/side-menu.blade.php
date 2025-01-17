@@ -6,14 +6,14 @@
 
 @section('content')
     @include('../layout/components/mobile-menu')
-    <div class="flex relative">
+    <div class="relative flex">
         <!-- BEGIN: Side Menu -->
         <nav class="side-nav" id="maildoll_sidebar_id">
-            <a href="{{ route('dashboard') }}" class="intro-x flex items-center text-gray-50 hide-less-768"
+            <a href="{{ route('dashboard') }}" class="flex items-center intro-x text-gray-50 hide-less-768"
                 style="justify-content: center;">
                 <img src="{{ logo() }}" alt="{{ orgName() }}" width="210" height="70" class="rounded">
             </a>
-            <div class="side-nav__devider my-6 hide-less-768"></div>
+            <div class="my-6 side-nav__devider hide-less-768"></div>
 
             {{-- My Custom nav --}}
 
@@ -344,6 +344,39 @@
 
                         </div>
                     </a>
+
+                    <ul
+                        class="d-none {{ request()->routeIs('templates.*') || request()->routeIs('template.builder.*') ? 'side-menu__sub-open' : '' }}">
+                        <li>
+
+                            <a href="{{ route('template.builder.originate') }}"
+                                class="side-menu {{ request()->routeIs('template.builder.originate') ? 'side-menu--active' : '' }}">
+                                <div class="side-menu__icon">
+                                    <i data-feather="align-left"></i>
+                                </div>
+                                <div class="side-menu__title">
+                                    @translate(Create Template)
+                                </div>
+                            </a>
+
+                            <a href="{{ route('templates.index') }}"
+                                class="side-menu {{ request()->routeIs('templates.index') || request()->routeIs('template.builder.edit.thumbnail') ? 'side-menu--active' : '' }}">
+                                <div class="side-menu__icon">
+                                    <i data-feather="book"></i>
+                                </div>
+                                <div class="side-menu__title">
+                                    @translate(Template List)
+                                </div>
+                            </a>
+
+                        </li>
+                    </ul>
+
+
+
+
+
+
 
                     <ul
                         class="d-none {{ request()->routeIs('templates.*') || request()->routeIs('template.builder.*') ? 'side-menu__sub-open' : '' }}">
@@ -1149,8 +1182,8 @@
                                     <ul
                                         class="d-none
                                         @foreach ($menu['sub_menu'] as $subMenuKey => $subMenu)
-                                            @isset(active_menu_name()[Route::currentRouteName()])                       
-                                                {{ active_menu_name()[Route::currentRouteName()] == $subMenu['active_route_name'] ? 'side-menu__sub-open' : '' }} 
+                                            @isset(active_menu_name()[Route::currentRouteName()])
+                                                {{ active_menu_name()[Route::currentRouteName()] == $subMenu['active_route_name'] ? 'side-menu__sub-open' : '' }}
                                             @endisset
                                             @endforeach
                                         ">
@@ -1194,8 +1227,8 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <div class="flex items-center bg-blue-500 text-white text-sm font-bold px-4 py-3 mt-3" role="alert">
-                        <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <div class="flex items-center px-4 py-3 mt-3 text-sm font-bold text-white bg-blue-500" role="alert">
+                        <svg class="w-4 h-4 mr-2 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                             <path
                                 d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z" />
                         </svg>
@@ -1260,7 +1293,7 @@
                     <div class="chat-logs" id="chatGPTLogs">
 
                         {{-- Right text here --}}
-                        
+
                         {{-- <div id="chatLoadingHTML"></div> --}}
                     </div>
                     <!--chat-log -->

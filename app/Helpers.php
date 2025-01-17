@@ -362,6 +362,22 @@ function menu()
             'disabled' => env('SAAS_ACTIVE') == 'YES' ? 'NO' : 'NO',
             'position' => 7,
             'sub_menu' => [
+                'create_form' => [
+                    'icon' => 'align-left',
+                    'route_name' => 'form-builder.create',
+                    'active_route_name' => 'builder',
+                    'params' => [],
+                    'disabled' => env('SAAS_ACTIVE') == 'YES' ? 'NO' : 'NO',
+                    'title' => 'Create Form',
+                ],
+                'all_form_template' => [
+                    'icon' => 'align-left',
+                    'route_name' => 'form-builder.index',
+                    'active_route_name' => 'builder',
+                    'params' => [],
+                    'disabled' => env('SAAS_ACTIVE') == 'YES' ? 'NO' : 'NO',
+                    'title' => 'All Form Template',
+                ],
                 'create_email' => [
                     'icon' => 'align-left',
                     'route_name' => 'template.builder.originate',
