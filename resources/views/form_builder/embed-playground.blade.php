@@ -9,6 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen bg-gray-100">
+    <div
+        id="loadingIndicator"
+        class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50"
+    >
+        <div class="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
 
     <!-- Navbar -->
     <div class="flex items-center justify-between p-4 border-b shadow bg-gray-50">
@@ -171,6 +177,11 @@
     <script>
         const formFields = ["email"];
 
+        function toggleLoading(show) {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.classList.toggle('hidden', !show);
+        }
+
         // Handle adding/removing fields
         document.querySelectorAll('.form-field-checkbox').forEach((checkbox) => {
             checkbox.addEventListener('change', function () {
@@ -228,6 +239,7 @@
 
 
         document.getElementById('previewForm').addEventListener('click', async () => {
+            toggleLoading(true);
             const formTitle = document.getElementById('formTitle').value;
             const formButton = document.getElementById('formButton').value;
             const formDescription = document.getElementById('formDescription').value;
@@ -263,6 +275,8 @@
                 }
             } catch (error) {
                 alert(`Failed to save form: ${error.message}`);
+            }finally {
+                toggleLoading(false);
             }
         });
 
