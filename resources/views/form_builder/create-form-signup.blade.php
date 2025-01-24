@@ -14,7 +14,7 @@
         <form action="{{ route('form.store') }}" method="POST">
             @csrf
 
-            <input type="hidden" name="form-type" value="signup" />
+            <input type="hidden" name="form_type" value="signup" />
             <!-- Form Name -->
             <div class="mb-4">
                 <label for="form_name" class="block mb-2 font-medium text-gray-700">Form Name</label>

@@ -1,4 +1,5 @@
 {
+    "404": "404",
     "505": "505",
     "ACTION": "ACTION",
     "Add Account": "Add Account",
@@ -186,6 +187,7 @@
     "SMS Logs": "SMS Logs",
     "SMS Settings": "SMS Settings",
     "SMS Templates": "SMS Templates",
+    "SORRY": "SORRY",
     "SUBJECT": "SUBJECT",
     "Sample Templates": "Sample Templates",
     "Save": "Save",
@@ -204,6 +206,7 @@
     "Template List": "Template List",
     "Template Preview Image": "Template Preview Image",
     "Template Title": "Template Title",
+    "The request URL was not found on this server.": "The request URL was not found on this server.",
     "Title": "Title",
     "To": "To",
     "Total": "Total",
@@ -214,6 +217,7 @@
     "User Phone": "User Phone",
     "Users Limit": "Users Limit",
     "Voice Servers": "Voice Servers",
+    "We could not found the page.": "We could not found the page.",
     "Whoops": "Whoops",
     "Why not try refreshing your page? or you can contact us if the error persists.": "Why not try refreshing your page? or you can contact us if the error persists."
 }

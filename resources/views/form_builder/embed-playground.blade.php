@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Form Builder</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen bg-gray-100">
@@ -12,7 +14,7 @@
     <div class="flex items-center justify-between p-4 border-b shadow bg-gray-50">
         <!-- Logo -->
         <div class="flex items-center">
-            <img src="http://foodstuff.store/latest/image/FSSLOGO1-1.png" alt="Logo" class="h-10">
+            <img src="http://foodstuff.store/latest/image/FSSLOGO1-2.png" alt="Logo" class="h-10">
         </div>
 
         <!-- Buttons -->
@@ -20,12 +22,13 @@
             <button
                 class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
             >
-                Finish Later
+              Save Draft
             </button>
             <button
+               id="previewForm"
                 class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             >
-                Continue
+                Preview Form
             </button>
         </div>
     </div>
@@ -81,22 +84,6 @@
                             >
                             <span>Phone Number</span>
                         </label>
-                        <label class="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                value="birthday"
-                                class="form-field-checkbox"
-                            >
-                            <span>Birthday</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                value="company"
-                                class="form-field-checkbox"
-                            >
-                            <span>Company</span>
-                        </label>
                     </div>
                 </div>
 
@@ -112,14 +99,26 @@
                         value="Subscribe"
                     >
                 </div>
-                <div class="mt-4">
-                    <label for="formWidth" class="block mb-1 text-gray-700">Form Width (px)</label>
+
+                <div>
+                    <label for="formButton" class="block mb-1 text-gray-700">Form Button</label>
                     <input
-                        type="number"
-                        id="formWidth"
+                        type="text"
+                        id="formButton"
                         class="w-full px-4 py-2 text-gray-700 border rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-                        placeholder="600"
-                        value="600"
+                        placeholder="Form Title"
+                        value="Submit"
+                    >
+                </div>
+
+                <div>
+                    <label for="formDescription" class="block mb-1 text-gray-700">Form Button</label>
+                    <input
+                        type="text"
+                        id="formDescription"
+                        class="w-full px-4 py-2 text-gray-700 border rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                        placeholder="Form Title"
+                        value="Form Description"
                     >
                 </div>
             </div>
@@ -127,16 +126,23 @@
 
         <!-- Main Pane -->
         <main class="flex-1 p-8 bg-white">
-            <h2 id="formTitleDisplay" class="mb-4 text-xl font-bold">Subscribe</h2>
+
             <div
                 id="formTemplate"
                 class="w-[600px] border border-gray-300 rounded-lg p-4 mx-auto"
             >
                 <!-- Logo -->
                 <div class="mb-4 text-center">
-                    <img src="http://foodstuff.store/latest/image/FSSLOGO1-1.png" alt="Logo" class="h-8 mx-auto">
+                    <img src="http://foodstuff.store/latest/image/FSSLOGO1-2.png" alt="Logo" class="h-8 mx-auto">
                 </div>
+                <div class="flex flex-col">
+                    <h2 id="formTitleDisplay" class="text-xl font-bold">Subscribe</h2>
+                    <p id="formDescriptionDisplay" class="mb-4 text-xs">type description</p>
+                </div>
+
                 <!-- Form Fields -->
+                <form>
+                    @csrf
                 <div id="formFieldsDisplay" class="space-y-4">
                     <!-- Default Email Field -->
                     <div id="email">
@@ -149,18 +155,22 @@
                         >
                     </div>
                 </div>
-                <!-- Subscribe Button -->
+                <!-- Submit Button -->
                 <button
-                    class="w-full px-4 py-2 mt-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                    id="formButtonDisplay"
+                    class="w-full px-4 py-2 mt-6 text-white bg-red-600 rounded-lg hover:bg-red-700"
                 >
-                    Subscribe
+                    Submit
                 </button>
+                </form>
             </div>
         </main>
     </div>
 
     <!-- Script for Real-time Updates -->
     <script>
+        const formFields = ["email"];
+
         // Handle adding/removing fields
         document.querySelectorAll('.form-field-checkbox').forEach((checkbox) => {
             checkbox.addEventListener('change', function () {
@@ -173,23 +183,30 @@
                     fieldWrapper.id = fieldId;
 
                     const label = document.createElement('label');
-                    label.textContent = fieldId.replace('_', ' ').toUpperCase();
+                    label.textContent = fieldId.split('_')
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+  .join(' ');
                     label.classList.add('block', 'text-gray-700', 'mb-1');
 
                     const input = document.createElement('input');
-                    input.type = 'text';
+                    input.type = fieldId=="phone"?'tel':'text';
+                    input.name = fieldId;
                     input.placeholder = `Enter your ${fieldId.replace('_', ' ')}`;
                     input.classList.add('w-full', 'px-4', 'py-2', 'border', 'rounded-lg');
 
                     fieldWrapper.appendChild(label);
                     fieldWrapper.appendChild(input);
                     fieldDisplay.appendChild(fieldWrapper);
+
+                    formFields.push(fieldId);
                 } else {
                     // Remove the field
                     const fieldToRemove = document.getElementById(fieldId);
                     if (fieldToRemove) {
                         fieldToRemove.remove();
                     }
+                    const index = formFields.indexOf(fieldId);
+                    if (index !== -1) formFields.splice(index, 1);
                 }
             });
         });
@@ -199,10 +216,82 @@
             document.getElementById('formTitleDisplay').textContent = this.value;
         });
 
-        // Update the form width in real-time
-        document.getElementById('formWidth').addEventListener('input', function () {
-            const formTemplate = document.getElementById('formTemplate');
-            formTemplate.style.width = `${this.value}px`;
+        document.getElementById('formDescription').addEventListener('input', function () {
+            document.getElementById('formDescriptionDisplay').textContent = this.value;
+        });
+
+
+        document.getElementById('formButton').addEventListener('input', function () {
+            document.getElementById('formButtonDisplay').textContent = this.value;
+        });
+
+
+
+        document.getElementById('previewForm').addEventListener('click', async () => {
+            const formTitle = document.getElementById('formTitle').value;
+            const formButton = document.getElementById('formButton').value;
+            const formDescription = document.getElementById('formDescription').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            const formData = {
+                title: formTitle,
+                form_id: {{$form->id}},
+                subtitle: formDescription,
+                button_text: formButton,
+                fields: formFields,
+                form_design: document.getElementById('formTemplate').innerHTML,
+            };
+            console.log(formData);
+            console.log(csrfToken);
+
+            try {
+                const response = await fetch('/saveForm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json',
+                    // 'X-CSRF-TOKEN': csrfToken,
+                 },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+                console.log(result);
+                if (response.ok) {
+                    // alert('Form saved successfully!');
+                    window.open(`/previewForm/${result.id}`, '_blank');
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                alert(`Failed to save form: ${error.message}`);
+            }
+        });
+
+
+        // Save form to DB
+        document.getElementById('submitForm').addEventListener('click', async () => {
+            const formTitle = document.getElementById('formTitle').value;
+            const formData = {
+                title: formTitle,
+                fields: formFields,
+                form_design: document.getElementById('formTemplate').innerHTML,
+            };
+
+            try {
+                const response = await fetch('/saveForm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Form saved successfully!');
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                alert(`Failed to save form: ${error.message}`);
+            }
         });
     </script>
 </body>

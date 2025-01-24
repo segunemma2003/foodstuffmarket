@@ -16,5 +16,6 @@ class VerifyCsrfToken extends Middleware {
         'chatgpt/*', //paytm csrf token
         'payment/callback',
         'payment/ipn',
+        '/save-form',
     ];
 }

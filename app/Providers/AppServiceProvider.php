@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        URL::forceScheme('https');
+        // URL::forceScheme('https');
         view()->composer('*', function ($view) {
             $view->with('user', auth()->user());
         });

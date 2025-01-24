@@ -32,11 +32,22 @@ Route::get('/form-create/embedded', [FormController::class, 'createEmbeddedForm'
 
 Route::post('/form-create/save', [FormController::class, 'store'])->name('form.store');
 
+
+Route::post('/saveForm', [FormController::class, 'show'])->name('form.show');
+
 // Create pop-up form
 Route::get('/form-create/popup', [FormController::class, 'createPopupForm'])->name('form.create.popup');
 
 // Create signup landing page
 Route::get('/form-create/signup', [FormController::class, 'createSignupPage'])->name('form.create.signup');
+
+
+Route::get('/form/{uuid}', [FormController::class, 'capture'])->name('form.capture');
+
+
+Route::get('/previewForm/{id}', [FormController::class, 'previewForm'])->name('form.prev');
+
+Route::get('/form/{id}/update', [FormController::class, 'updateForm'])->name('form.updateForm');
 
 Route::post('update-env', function (Request $request) {
     $system = OrganizationSetup::where('name', 'test_connection_email')->first();

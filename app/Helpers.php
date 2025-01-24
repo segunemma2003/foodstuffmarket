@@ -56,6 +56,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 
+
+if (!function_exists('menu')) {
 function menu()
 {
     $menu = [
@@ -852,6 +854,7 @@ function menu()
     ];
 
     return collect($menu)->sortBy('position')->toArray();
+}
 }
 
 /**
