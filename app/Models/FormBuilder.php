@@ -14,6 +14,10 @@ class FormBuilder extends Model
         'fields' => 'array',
     ];
 
+    public function group(){
+        return $this->belongsTo(EmailGroup::class, 'group_id');
+    }
+
     public function responses()
     {
         return $this->hasMany(FormBuilderResponse::class,'form_builder_id');

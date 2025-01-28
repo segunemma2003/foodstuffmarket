@@ -18,10 +18,11 @@ Route::get('rasel', function () {
 });
 
 
-Route::get('/form-builder', function(){
-    return view('form_builder.template-list');
-})->name('form-builder.index');
-
+Route::group(['middleware'=>'auth'], function(){
+    Route::get('/form-builder', [FormController::class, 'index'])->name('form-builder.index');
+// function(){
+//     return view('form_builder.template-list');
+// }
 Route::get('/form-builder/create', function(){
     return view('form_builder.create-form');
 })->name('form-builder.create');
@@ -44,10 +45,16 @@ Route::get('/form-create/signup', [FormController::class, 'createSignupPage'])->
 
 Route::get('/form/{uuid}', [FormController::class, 'capture'])->name('form.capture');
 
+Route::post('/form/{uuid}', [FormController::class, 'captureResponse'])->name('form.captureResponse');
+
 
 Route::get('/previewForm/{id}', [FormController::class, 'previewForm'])->name('form.prev');
 
 Route::get('/form/{id}/update', [FormController::class, 'updateForm'])->name('form.updateForm');
+
+
+Route::get('/form/{id}/responses', [FormController::class, 'responses'])->name('form.responses');
+});
 
 Route::post('update-env', function (Request $request) {
     $system = OrganizationSetup::where('name', 'test_connection_email')->first();

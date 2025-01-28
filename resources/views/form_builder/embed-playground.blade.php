@@ -6,6 +6,7 @@
     <title>Form Builder</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-screen bg-gray-100">
@@ -26,6 +27,7 @@
         <!-- Buttons -->
         <div class="flex items-center space-x-4">
             <button
+            id="saveDraft"
                 class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
             >
               Save Draft
@@ -45,6 +47,10 @@
         <aside class="w-1/4 p-4 bg-white border-r">
             <h2 class="mb-4 text-lg font-semibold text-gray-700">Form Fields</h2>
             <div class="space-y-2">
+                @php
+                // Decode the JSON fields from the database
+                $savedFields = $form->fields ? json_decode($form->fields, true) : [];
+            @endphp
                 <!-- Form Fields Checkboxes -->
                 <div>
                     <label class="block mb-2 font-medium text-gray-700">Choose Fields</label>
@@ -54,6 +60,7 @@
                                 type="checkbox"
                                 value="email"
                                 class="form-field-checkbox"
+                                {{-- {{ in_array('email', $savedFields) ? 'checked' : '' }} --}}
                                 checked
                             >
                             <span>Email</span>
@@ -63,6 +70,7 @@
                                 type="checkbox"
                                 value="first_name"
                                 class="form-field-checkbox"
+                                {{ in_array('first_name', $savedFields) ? 'checked' : '' }}
                             >
                             <span>First Name</span>
                         </label>
@@ -71,6 +79,7 @@
                                 type="checkbox"
                                 value="last_name"
                                 class="form-field-checkbox"
+                                {{ in_array('last_name', $savedFields) ? 'checked' : '' }}
                             >
                             <span>Last Name</span>
                         </label>
@@ -79,6 +88,7 @@
                                 type="checkbox"
                                 value="address"
                                 class="form-field-checkbox"
+                                {{ in_array('address', $savedFields) ? 'checked' : '' }}
                             >
                             <span>Address</span>
                         </label>
@@ -87,6 +97,7 @@
                                 type="checkbox"
                                 value="phone"
                                 class="form-field-checkbox"
+                                {{ in_array('phone', $savedFields) ? 'checked' : '' }}
                             >
                             <span>Phone Number</span>
                         </label>
@@ -102,7 +113,7 @@
                         id="formTitle"
                         class="w-full px-4 py-2 text-gray-700 border rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         placeholder="Form Title"
-                        value="Subscribe"
+                         value="{{ $form->title ?? 'Subscribe' }}"
                     >
                 </div>
 
@@ -113,7 +124,7 @@
                         id="formButton"
                         class="w-full px-4 py-2 text-gray-700 border rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         placeholder="Form Title"
-                        value="Submit"
+                        value="{{ $form->button_text ?? 'Submit' }}"
                     >
                 </div>
 
@@ -124,7 +135,7 @@
                         id="formDescription"
                         class="w-full px-4 py-2 text-gray-700 border rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                         placeholder="Form Title"
-                        value="Form Description"
+                        value="{{ $form->subtitle ?? 'Form Description' }}"
                     >
                 </div>
             </div>
@@ -132,56 +143,118 @@
 
         <!-- Main Pane -->
         <main class="flex-1 p-8 bg-white">
-
-            <div
+           <div
                 id="formTemplate"
                 class="w-[600px] border border-gray-300 rounded-lg p-4 mx-auto"
             >
-                <!-- Logo -->
-                <div class="mb-4 text-center">
-                    <img src="http://foodstuff.store/latest/image/FSSLOGO1-2.png" alt="Logo" class="h-8 mx-auto">
-                </div>
-                <div class="flex flex-col">
-                    <h2 id="formTitleDisplay" class="text-xl font-bold">Subscribe</h2>
-                    <p id="formDescriptionDisplay" class="mb-4 text-xs">type description</p>
-                </div>
+            <div class="mb-4 text-center">
+                <img src="http://foodstuff.store/latest/image/FSSLOGO1-2.png" alt="Logo" class="h-8 mx-auto">
+            </div>
+            <div class="flex flex-col">
+                <h2 id="formTitleDisplay" class="text-xl font-bold">Subscribe</h2>
+                <p id="formDescriptionDisplay" class="mb-4 text-xs">type description</p>
+            </div>
 
-                <!-- Form Fields -->
-                <form>
-                    @csrf
-                <div id="formFieldsDisplay" class="space-y-4">
-                    <!-- Default Email Field -->
-                    <div id="email">
-                        <label for="email" class="block mb-1 text-gray-700">Email Address</label>
-                        <input
-                            type="email"
-                            id="emailInput"
-                            class="w-full px-4 py-2 border rounded-lg"
-                            placeholder="Enter your email"
-                        >
-                    </div>
-                </div>
-                <!-- Submit Button -->
-                <button
-                    id="formButtonDisplay"
-                    class="w-full px-4 py-2 mt-6 text-white bg-red-600 rounded-lg hover:bg-red-700"
-                >
-                    Submit
-                </button>
-                </form>
+            <!-- Form Fields -->
+
+            <div id="formFieldsDisplay" class="space-y-4">
+                <!-- Default Email Field -->
+                {{-- <div id="email">
+                    <label for="email" class="block mb-1 text-gray-700">Email Address</label>
+                    <input
+                        type="email"
+                        id="emailInput"
+                        class="w-full px-4 py-2 border rounded-lg"
+                        placeholder="Enter your email"
+                    >
+                </div> --}}
+            </div>
+            <!-- Submit Button -->
+            <button
+                id="formButtonDisplay"
+                type="submit"
+                class="w-full px-4 py-2 mt-6 text-white bg-red-600 rounded-lg hover:bg-red-700"
+            >
+                Submit
+            </button>
+                <!-- Logo -->
+
             </div>
         </main>
     </div>
 
     <!-- Script for Real-time Updates -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
-        const formFields = ["email"];
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        // Check if it's an array
+        console.log(@json($form->fields)); // logs the fields correctly
+        let formFields = @json($form->formFields); // This is the JSON string
+
+        // Parse it to an actual JavaScript array
+        formFields = JSON.parse(formFields) ?? ['email'];
+        console.log(Array.isArray(formFields));
 
         function toggleLoading(show) {
             const loadingIndicator = document.getElementById('loadingIndicator');
             loadingIndicator.classList.toggle('hidden', !show);
         }
 
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all checked checkboxes
+            const checkedCheckboxes = document.querySelectorAll('.form-field-checkbox:checked');
+
+            // Add fields for checked checkboxes
+            checkedCheckboxes.forEach((checkbox) => {
+                const fieldId = checkbox.value;
+                const fieldDisplay = document.getElementById('formFieldsDisplay');
+
+                // Create the field wrapper
+                const fieldWrapper = document.createElement('div');
+                fieldWrapper.id = fieldId;
+
+                // Create the label
+                const label = document.createElement('label');
+                label.textContent = fieldId.split('_')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+                label.classList.add('block', 'text-gray-700', 'mb-1');
+
+                // Create the input
+                const input = document.createElement('input');
+                input.type = fieldId === 'phone' ? 'tel' :fieldId === 'email'? "email": 'text';
+                input.name = fieldId;
+                input.placeholder = `Enter your ${fieldId.replace('_', ' ')}`;
+                input.classList.add('w-full', 'px-4', 'py-2', 'border', 'rounded-lg');
+
+                // Append label and input to the wrapper
+                fieldWrapper.appendChild(label);
+                fieldWrapper.appendChild(input);
+
+                // Append the wrapper to the form fields display
+                fieldDisplay.appendChild(fieldWrapper);
+            });
+        });
         // Handle adding/removing fields
         document.querySelectorAll('.form-field-checkbox').forEach((checkbox) => {
             checkbox.addEventListener('change', function () {
@@ -210,6 +283,7 @@
                     fieldDisplay.appendChild(fieldWrapper);
 
                     formFields.push(fieldId);
+                    console.log(formFields);
                 } else {
                     // Remove the field
                     const fieldToRemove = document.getElementById(fieldId);
@@ -218,25 +292,83 @@
                     }
                     const index = formFields.indexOf(fieldId);
                     if (index !== -1) formFields.splice(index, 1);
+                    console.log(formFields);
                 }
             });
         });
+
+        const formTitle = "<?php echo $form->title ?? ''; ?>";
+        const formSubtitle = "<?php echo $form->subtitle ?? ''; ?>";
+        const formButtonText = "<?php echo $form->button_text ?? ''; ?>";
+
+        // Set default display values if not null
+        if (formTitle) {
+            document.getElementById('formTitleDisplay').textContent = formTitle;
+            document.getElementById('formTitle').value = formTitle;
+        }
+
+        if (formSubtitle) {
+            document.getElementById('formDescriptionDisplay').textContent = formSubtitle;
+            document.getElementById('formDescription').value = formSubtitle;
+        }
+
+        if (formButtonText) {
+            document.getElementById('formButtonDisplay').textContent = formButtonText;
+            document.getElementById('formButton').value = formButtonText;
+        }
 
         // Update the form title in real-time
         document.getElementById('formTitle').addEventListener('input', function () {
             document.getElementById('formTitleDisplay').textContent = this.value;
         });
 
+        // Update the form subtitle/description in real-time
         document.getElementById('formDescription').addEventListener('input', function () {
             document.getElementById('formDescriptionDisplay').textContent = this.value;
         });
 
-
+        // Update the form button text in real-time
         document.getElementById('formButton').addEventListener('input', function () {
             document.getElementById('formButtonDisplay').textContent = this.value;
         });
 
+        document.getElementById('saveDraft').addEventListener('click', async () => {
+            toggleLoading(true);
+            const formTitle = document.getElementById('formTitle').value;
+            const formButton = document.getElementById('formButton').value;
+            const formDescription = document.getElementById('formDescription').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+console.log(formFields);
+            const formData = {
+                title: formTitle,
+                form_id: {{ $form->id }},
+                subtitle: formDescription,
+                button_text: formButton,
+                fields: formFields,
+                form_design: document.getElementById('formTemplate').innerHTML,
+                status: 'draft', // Ensure the status remains 'draft'
+            };
 
+            try {
+                const response = await axios.post('/api/saveForm', formData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                });
+
+                if (response.status === 200) {
+                    toastr.success('Draft saved successfully!');
+                } else {
+                    toastr.error('Failed to save draft.');
+                }
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                toastr.error('Error saving draft. Please try again.');
+            } finally {
+                toggleLoading(false);
+            }
+        });
 
         document.getElementById('previewForm').addEventListener('click', async () => {
             toggleLoading(true);
@@ -251,30 +383,34 @@
                 subtitle: formDescription,
                 button_text: formButton,
                 fields: formFields,
+                status: 'draft',
                 form_design: document.getElementById('formTemplate').innerHTML,
             };
             console.log(formData);
             console.log(csrfToken);
 
             try {
-                const response = await fetch('/saveForm', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json',
-                    // 'X-CSRF-TOKEN': csrfToken,
-                 },
-                    body: JSON.stringify(formData),
-                });
 
-                const result = await response.json();
-                console.log(result);
-                if (response.ok) {
-                    // alert('Form saved successfully!');
-                    window.open(`/previewForm/${result.id}`, '_blank');
+                const response = await axios.post('/api/saveForm', formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            }});
+
+                if (response.status == 200) {
+                    toastr.success('Form saved successfully!');
+                    console.log(response.data);
+                    window.open(`/previewForm/${response.data.id}`, '_blank');
                 } else {
-                    alert(`Error: ${result.message}`);
+                    console.log(`Error: ${response.data.message}`);
+                    toastr.error(`Error: Unable to preview builder`);
                 }
+
+
             } catch (error) {
-                alert(`Failed to save form: ${error.message}`);
+                console.log(`Failed to save form: ${error.message}`);
+                toastr.error('Error in preview, contact administrator');
+                // alert(`Failed to save form: ${error.message}`);
             }finally {
                 toggleLoading(false);
             }
@@ -291,10 +427,10 @@
             };
 
             try {
-                const response = await fetch('/saveForm', {
+                const response = await fetch('/api/saveForm', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData),
+                    body: formData,
                 });
 
                 const result = await response.json();

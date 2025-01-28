@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\ApiKeyController;
+use App\Http\Controllers\FormController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::apiResource('smtp/providers', SmtpController::class);
 
+Route::post('/saveForm', [FormController::class, 'show'])->name('form.show');
+Route::post('/save/form', [FormController::class, 'saveItem'])->name('form.saveItem');
 /**
  * VERSION 5.3.0::STARTS
  */
