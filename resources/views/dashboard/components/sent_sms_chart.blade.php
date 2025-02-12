@@ -1,7 +1,7 @@
 <div class="col-span-12 lg:col-span-6 mt-8">
                 <div class="intro-y block sm:flex items-center h-10">
                     <h2 class="text-lg font-medium truncate mr-5">@translate(Sent SMS Report)</h2>
-                  
+
                 </div>
                 <div class="intro-y box p-5 mt-12 sm:mt-5">
                     <div class="flex flex-col xl:flex-row xl:items-center">
@@ -16,7 +16,7 @@
                                 <div class="text-gray-600 dark:text-gray-600">@translate(Last Month)</div>
                             </div>
                         </div>
-                     
+
                     </div>
 
                     <div>
@@ -32,13 +32,20 @@
 
 
                 "use strict"
-                
+
                var options = {
           series: [{
           name: 'Twilio',
           data: [
               @foreach(sentSMSMonthWiseCurrentYearDataTwilio() as $sent_sms_twilio)
               {{ $sent_sms_twilio->count }},
+              @endforeach
+          ]
+        }, {
+          name: 'Termii',
+          data: [
+              @foreach(sentSMSMonthWiseCurrentYearDataTermii() as $sent_sms_termii)
+              {{ $sent_sms_termii->count }},
               @endforeach
           ]
         }, {
@@ -101,5 +108,5 @@
 
         var chart = new ApexCharts(document.querySelector("#sent_sms_chart"), options);
         chart.render();
-    
+
             </script>

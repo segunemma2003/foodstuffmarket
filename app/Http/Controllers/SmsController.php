@@ -143,7 +143,11 @@ class SmsController extends Controller {
                     ->where('sms_name', 'textlocal')
                     ->first();
 
-                return view('sms.index', compact('textlocal', 'twilio', 'nexmo', 'plivo', 'infobip', 'viber', 'whatsapp', 'telesign', 'sinch', 'clickatell', 'mailjet', 'lao', 'aakash'));
+                $termii = Sms::HasAgent()
+                    ->where('sms_name', 'termii')
+                    ->first();
+
+                return view('sms.index', compact('textlocal', 'twilio', 'nexmo', 'plivo', 'infobip', 'viber', 'whatsapp', 'telesign', 'sinch', 'clickatell', 'mailjet', 'lao', 'aakash', 'termii'));
             } else {
                 return view('sms_config.index');
             }
@@ -395,6 +399,22 @@ class SmsController extends Controller {
                     return back();
 
                     break; // VERSION 6.0.0
+                case 'termii': // VERSION 6.1.0
+                        $termii = Sms::firstOrNew(['sms_name' => $sms, 'owner_id' => Auth::user()->id]);
+                        $termii->sms_name = $sms;
+                        $termii->sms_id = $request->sms_id;
+                        $termii->sms_from = $request->sms_from;
+                        $termii->sms_token = $request->sms_token;
+                        $termii->sms_number = $request->sms_number;
+                        $termii->owner_id = Auth::user()->id;
+                        $termii->url = $request->url;
+                        $termii->save();
+
+                        notify()->success(Str::ucfirst($sms).' '.translate('Configured'));
+
+                        return back();
+
+                        break;
 
                 default:
                     notify()->error(translate('Failed Configured SMS'));
@@ -841,6 +861,48 @@ class SmsController extends Controller {
                     curl_close($ch);
 
                     telling(route('log.sms'), translate('New SMS Camapaign With Aakash SMS'));
+                    notify()->success(translate('Message Sent'));
+
+                    return back();
+
+                    break;
+                case 'termii':
+
+                    if (env('ADMIN_SMS_CONFIG') == 'NO') {
+                        $termii = Sms::where('sms_name', 'termii')->HasAgent()->first();
+                    } else {
+                        $termii = SmsService::where('sms_name', 'termii')->HasAgent()->first();
+                    }
+
+                    $args = array("api_key" => $termii->sms_token, "to" => org('test_connection_sms'),  "from" => "N-Alert",
+                    "sms" => 'This is your test message from '.org('company_name').'.',  "type" => "plain",  "channel" => "dnd" );
+
+
+                    $url = $termii->url;
+                    $post_data = json_encode($args);
+                    // Make the call using API.
+                    $curl = curl_init();
+
+                    curl_setopt_array($curl, array(
+                    CURLOPT_URL => "https://v3.api.termii.com/api/sms/send",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS => $post_data,
+                    CURLOPT_HTTPHEADER => array(
+                    "Content-Type: application/json"
+                    ),
+                    ));
+
+                    $response = curl_exec($curl);
+
+                    curl_close($curl);
+
+                    telling(route('log.sms'), translate('New SMS Camapaign With termii SMS'));
                     notify()->success(translate('Message Sent'));
 
                     return back();
@@ -1531,6 +1593,67 @@ class SmsController extends Controller {
                         return back();
 
                         break;
+                    case 'termii':
+
+                        if (env('ADMIN_SMS_CONFIG') == 'NO') {
+                            $termii = Sms::where('sms_name', 'termii')->HasAgent()->first();
+                        } else {
+                            $termii = SmsService::where('id', $gateway_id)->first();
+                        }
+
+                        foreach ($campaignSMSs as $campaignSMS) {
+                            $number = $campaignSMS->phones->country_code.$campaignSMS->phones->phone;
+
+                            $args = array("api_key" => $termii->sms_token, "to" => $number,  "from" => "N-Alert",
+                            "sms" => strip_tags($sms_built->body),  "type" => "plain",  "channel" => "dnd" );
+
+
+                            $url = $termii->url;
+                            $post_data = json_encode($args);
+                    // Make the call using API.
+                        $curl = curl_init();
+
+                        curl_setopt_array($curl, array(
+                        CURLOPT_URL => "https://v3.api.termii.com/api/sms/send",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_POSTFIELDS => $post_data,
+                        CURLOPT_HTTPHEADER => array(
+                        "Content-Type: application/json"
+                        ),
+                        ));
+
+                        $response = curl_exec($curl);
+
+                        curl_close($curl);
+
+                        }
+
+                        /**
+                         * Email Limit
+                         */
+                        $email_limit = EmailSMSLimitRate::where('owner_id', Auth::id())
+                            ->first();
+
+                        if ($email_limit->sms > 0) {
+                            EmailSMSLimitRate::where('owner_id', Auth::id())
+                                ->decrement('sms', count($campaignSMSs));
+                        }
+
+                        /**
+                         * Email Limit::END
+                         */
+                        telling(route('log.sms'), translate('New SMS Camapaign With Aakash SMS'));
+                        notify()->success(translate('Message Sent'));
+
+                        return back();
+
+                        break;
 
                     default:
                         notify()->error(translate('Something went wrong. Check configuration'));
@@ -1760,6 +1883,69 @@ class SmsController extends Controller {
                         $response = curl_exec($curl);
 
                         curl_close($curl);
+
+                        smsLog($campaignSMS->id, $campaignSMS->phones->phone, strip_tags($sms_built->body), $gateway);
+                    } //foreach
+
+                    /**
+                     * Email Limit
+                     */
+                    $email_limit = EmailSMSLimitRate::where('owner_id', Auth::id())
+                        ->first();
+
+                    if ($email_limit->sms > 0) {
+                        EmailSMSLimitRate::where('owner_id', Auth::id())
+                            ->decrement('sms', count($campaignSMSs));
+                    }
+
+                    /**
+                     * Email Limit::END
+                     */
+                    telling(route('log.sms'), translate('New SMS Camapaign With Infobip'));
+                    notify()->success(translate('Message Sent'));
+
+                    return back();
+
+                    break;
+
+
+                case 'termii':
+
+                    if (env('ADMIN_SMS_CONFIG') == 'NO') {
+                        $termii = Sms::where('sms_name', 'termii')->HasAgent()->first();
+                    } else {
+                        $termii = SmsService::where('id', $gateway_id)->first();
+                    }
+
+                    foreach ($campaignSMSs as $campaignSMS) {
+
+                        $data = array("api_key" => $termii->sms_token, "to" => $campaignSMS->phones->country_code.$campaignSMS->phones->phone,  "from" => "N-Alert",
+                        "sms" => $sms_built->body,  "type" => "plain",  "channel" => "dnd" );
+                        $curl = curl_init();
+
+
+                        $post_data = json_encode($data);
+
+                        curl_setopt_array($curl, array(
+                        CURLOPT_URL => "https://v3.api.termii.com/api/sms/send",
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => "POST",
+                        CURLOPT_POSTFIELDS => $post_data,
+                        CURLOPT_HTTPHEADER => array(
+                        "Content-Type: application/json"
+                        ),
+                        ));
+
+                        $response = curl_exec($curl);
+
+                        curl_close($curl);
+
+
 
                         smsLog($campaignSMS->id, $campaignSMS->phones->phone, strip_tags($sms_built->body), $gateway);
                     } //foreach
@@ -2759,6 +2945,29 @@ class SmsController extends Controller {
                     return redirect()->route('sms.index');
 
                     break; // VERSION 6.0.0
+                case 'termii': // VERSION 6.1.0
+
+                    $termii = new SmsService;
+                    $termii->sms_name = $sms;
+                    $termii->sms_id = $request->sms_id;
+                    $termii->sms_token = $request->sms_token;
+
+                    $termii->owner_id = Auth::user()->id;
+                    $termii->url = $request->url;
+                    $termii->save();
+
+                    $termii_sender = SmsSenderId::firstOrNew(['id' => $termii->id, 'owner_id' => Auth::user()->id]);
+                    $termii_sender->owner_id = $termii->owner_id;
+                    $termii_sender->sms_service_id = $termii->id;
+                    $termii_sender->sms_from = $request->sms_from;
+                    $termii_sender->sms_number = $request->sms_number;
+                    $termii_sender->save();
+
+                    notify()->success(Str::ucfirst($sms).' '.translate('Configured'));
+
+                    return redirect()->route('sms.index');
+
+                    break; // VERSION 6.0.0
 
                 default:
                     notify()->error(translate('Failed Configured SMS'));
@@ -3135,6 +3344,33 @@ class SmsController extends Controller {
                     $aakash_sender->sms_from = $request->sms_from;
                     $aakash_sender->sms_number = $request->sms_number;
                     $aakash_sender->save();
+
+                    notify()->success(Str::ucfirst($sms).' '.translate('Configured'));
+
+                    return redirect()->route('sms.index');
+
+                    break; // VERSION 6.0.0
+                case 'termii': // VERSION 6.1.0
+
+                    $termii = SmsService::where('id', $request->id)->HasAgent()->first();
+
+                    if (Auth::user()->user_type == 'Admin') {
+                        $termii->sms_name = $sms;
+                        $termii->sms_id = $request->sms_id;
+                        $termii->sms_token = $request->sms_token;
+                        $termii->sms_from = $request->sms_from;
+                        $termii->sms_number = $request->sms_number;
+                        $termii->owner_id = Auth::user()->id;
+                        $termii->url = $request->url;
+                        $termii->save();
+                    }
+
+                    $termii_sender = SmsSenderId::firstOrnew(['id' => $request->id, 'owner_id' => Auth::user()->id]);
+                    $termii_sender->owner_id = Auth::user()->id;
+                    $termii_sender->sms_service_id = $request->id;
+                    $termii_sender->sms_from = $request->sms_from;
+                    $termii_sender->sms_number = $request->sms_number;
+                    $termii_sender->save();
 
                     notify()->success(Str::ucfirst($sms).' '.translate('Configured'));
 

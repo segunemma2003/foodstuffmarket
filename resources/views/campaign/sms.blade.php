@@ -30,7 +30,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="col-span-12 xl:col-span-6 intro-y">
 			<div class="report-box">
 				<div class="box p-5">
@@ -148,6 +148,10 @@
 
 														<a class="button tooltip w-24 h6 inline-block mr-1 mb-2 bg-theme-1 text-white inline-flex items-center" title="@translate(Start With Twilio)" href="{{ route('campaign.send.sms', [$campaign->id, $campaign->sms_template_id, 'twilio']) }}" onclick="loaderSMSSending()">
 															@translate(Twilio)
+														</a>
+
+                                                        <a class="button tooltip w-24 h6 inline-block mr-1 mb-2 bg-theme-1 text-white inline-flex items-center" title="Start With Termii" href="{{ route('campaign.send.sms', [$campaign->id, $campaign->sms_template_id, 'termii']) }}" onclick="loaderSMSSending()">
+															Termii
 														</a>
 
 														<a class="button tooltip w-24 h6 inline-block mr-1 mb-2 bg-theme-1 text-white inline-flex items-center" title="@translate(Start With Nexmo)" href="{{ route('campaign.send.sms', [$campaign->id, $campaign->sms_template_id, 'nexmo']) }}" onclick="loaderSMSSending()">

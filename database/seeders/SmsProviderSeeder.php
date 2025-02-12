@@ -72,6 +72,18 @@ class SmsProviderSeeder extends Seeder {
         $provider->owner_id = 1;
         $provider->save();
 
+
+
+        $provider = new Sms;
+        $provider->sms_name = 'termii';
+        $provider->sms_id = null;
+        $provider->sms_token = null;
+        $provider->sms_from = null;
+        $provider->sms_number = null;
+        $provider->url = null;
+        $provider->owner_id = 1;
+        $provider->save();
+
         $provider = new Sms;
         $provider->sms_name = 'lao';
         $provider->sms_id = null;

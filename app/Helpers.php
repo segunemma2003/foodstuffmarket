@@ -2072,6 +2072,19 @@ function sentSMSMonthWiseCurrentYearDataPlivo()
         ->get();
 }
 
+
+
+function sentSMSMonthWiseCurrentYearDataTermii()
+{
+    return SmsLog::where('user_id', Auth::user()->id)
+        ->select(DB::raw('(COUNT(*)) as count'), DB::raw('MONTHNAME(created_at) as monthname'))
+        ->whereYear('created_at', date('Y'))
+        ->orderByRaw('DATE_FORMAT(created_at, "%m-%d")')
+        ->where('gateway', 'termii')
+        ->groupBy('monthname')
+        ->get();
+}
+
 /**
  * Get Current Month Data
  */
