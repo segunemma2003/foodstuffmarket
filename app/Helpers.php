@@ -4271,6 +4271,7 @@ function sms_provider_list()
         'clickatell',
         'mailjet',
         'textlocal',
+        'termii'
         // 'lao',
         // 'aakash'
     ];
