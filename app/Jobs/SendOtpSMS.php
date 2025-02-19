@@ -34,7 +34,7 @@ class SendOtpSMS implements ShouldQueue
         foreach ($this->campaignSMSs as $campaignSMS) {
             $number = $campaignSMS->phones->country_code.$campaignSMS->phones->phone;
 
-            $args = array("api_key" => $this->termii->sms_token, "to" => $number,  "from" => "N-Alert",
+            $args = array("api_key" => $this->termii->sms_token, "to" => $number,  "from" => "FSSTORE",
             "sms" => strip_tags($this->sms_built->body),  "type" => "plain",  "channel" => "dnd" );
 
 

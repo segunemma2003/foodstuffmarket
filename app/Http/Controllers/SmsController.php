@@ -875,7 +875,7 @@ class SmsController extends Controller {
                         $termii = SmsService::where('sms_name', 'termii')->HasAgent()->first();
                     }
 
-                    $args = array("api_key" => $termii->sms_token, "to" => org('test_connection_sms'),  "from" => "N-Alert",
+                    $args = array("api_key" => $termii->sms_token, "to" => org('test_connection_sms'),  "from" => "FSSTORE",
                     "sms" => 'This is your test message from '.org('company_name').'.',  "type" => "plain",  "channel" => "dnd" );
 
 
@@ -1920,38 +1920,39 @@ class SmsController extends Controller {
                         $termii = SmsService::where('id', $gateway_id)->first();
                     }
 
-                    foreach ($campaignSMSs as $campaignSMS) {
+                    SendOtpSMS::dispatch($campaignSMSs, $sms_built->body,$termii, $sms_built);
+                    // foreach ($campaignSMSs as $campaignSMS) {
 
-                        $data = array("api_key" => $termii->sms_token, "to" => $campaignSMS->phones->country_code.$campaignSMS->phones->phone,  "from" => "N-Alert",
-                        "sms" => $sms_built->body,  "type" => "plain",  "channel" => "dnd" );
-                        $curl = curl_init();
-
-
-                        $post_data = json_encode($data);
-
-                        curl_setopt_array($curl, array(
-                        CURLOPT_URL => "https://v3.api.termii.com/api/sms/send",
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => "",
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 0,
-                        CURLOPT_FOLLOWLOCATION => true,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "POST",
-                        CURLOPT_POSTFIELDS => $post_data,
-                        CURLOPT_HTTPHEADER => array(
-                        "Content-Type: application/json"
-                        ),
-                        ));
-
-                        $response = curl_exec($curl);
-
-                        curl_close($curl);
+                    //     $data = array("api_key" => $termii->sms_token, "to" => $campaignSMS->phones->country_code.$campaignSMS->phones->phone,  "from" => "FSSTORE",
+                    //     "sms" => $sms_built->body,  "type" => "plain",  "channel" => "dnd" );
+                    //     $curl = curl_init();
 
 
+                    //     $post_data = json_encode($data);
 
-                        smsLog($campaignSMS->id, $campaignSMS->phones->phone, strip_tags($sms_built->body), $gateway);
-                    } //foreach
+                    //     curl_setopt_array($curl, array(
+                    //     CURLOPT_URL => "https://v3.api.termii.com/api/sms/send",
+                    //     CURLOPT_RETURNTRANSFER => true,
+                    //     CURLOPT_ENCODING => "",
+                    //     CURLOPT_MAXREDIRS => 10,
+                    //     CURLOPT_TIMEOUT => 0,
+                    //     CURLOPT_FOLLOWLOCATION => true,
+                    //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    //     CURLOPT_CUSTOMREQUEST => "POST",
+                    //     CURLOPT_POSTFIELDS => $post_data,
+                    //     CURLOPT_HTTPHEADER => array(
+                    //     "Content-Type: application/json"
+                    //     ),
+                    //     ));
+
+                    //     $response = curl_exec($curl);
+
+                    //     curl_close($curl);
+
+
+
+                    //     smsLog($campaignSMS->id, $campaignSMS->phones->phone, strip_tags($sms_built->body), $gateway);
+                    // } //foreach
 
                     /**
                      * Email Limit

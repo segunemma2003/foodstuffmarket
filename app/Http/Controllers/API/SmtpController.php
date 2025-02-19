@@ -153,7 +153,8 @@ class SmtpController extends Controller {
 
                 break;
             case 'termii':
-                $data = array("api_key" => $termii->sms_token, "to" => org('test_connection_sms'),  "from" => "N-Alert",
+                $termii = Sms::where('sms_name', 'infobip')->where('owner_id', 1)->first();
+                $data = array("api_key" => $termii->sms_token, "to" => org('test_connection_sms'),  "from" => "FSSTORE",
                 "sms" => "Hello from '.org('company_name').'",  "type" => "plain",  "channel" => "dnd" );
 
                     $curl = curl_init();
